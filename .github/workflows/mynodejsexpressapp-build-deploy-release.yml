@@ -1,0 +1,29 @@
+
+
+name: Deploy Infrastructure and build release node js application
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  infrastructure: 
+    runs-on: ubuntu-latest 
+
+    steps:
+      - uses: actions/checkout@v2 
+
+      - name: Setup Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }} 
+
+      - name: Deploy or update infrastructure
+        uses: azure/arm-deploy@v1
+        with:
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }} 
+          resourceGroupName: ${{ vars.NODEJS_RG }} 
+          template: ./devops/dev/main.dev.bicep 
+          parameters: ./devops/dev/main.dev.bicepparam
+          failOnStdErr: false
