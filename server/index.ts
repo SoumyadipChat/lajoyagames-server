@@ -26,6 +26,7 @@ interface ServerToClientEvents {
   receiveDiceRolls: (dice1: number, dice2: number) => void;
   startNextRound: () => void;
   receiveResults: (results: number[]) => void;
+  playerReady: (playerIndex: number) => void;
 }
 
 interface ClientToServerEvents {
@@ -45,6 +46,7 @@ interface ClientToServerEvents {
   startDiceRoll: (roomname: string) => void;
   getResults: (roomname: string,players: string[]) => void;
   startNextRound: (roomname: string) => void;
+  playerReady: (roomname: string, playerIndex: number) => void;
 }
 
 interface InterServerEvents {
@@ -158,6 +160,11 @@ io.on("connection", (socket) => {
   socket.on("startNextRound", (roomName: string) => {
     socket.to(roomName).emit("startNextRound");
     socket.emit("startNextRound");
+  });
+
+  socket.on("playerReady", (roomName: string,playerIndex: number) => {
+    socket.to(roomName).emit("playerReady", playerIndex);
+    socket.emit("playerReady", playerIndex);
   });
 
   socket.on("getResults", (roomName: string, players: string[]) => {
