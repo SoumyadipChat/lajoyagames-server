@@ -40,7 +40,7 @@ interface ClientToServerEvents {
   startGame: (roomname: string) => void;
   endGame: (roomname: string) => void;
   //Lucky7 Events
-  createLucky7Room: (name: string, size: number) => void;
+  createLucky7Room: (name: string, size: number, playerName: string) => void;
   startLucky7Game: (roomname: string, rounds: number) => void;
   sendOptionSelected: (roomname: string, val: number, player: string) => void;
   startDiceRoll: (roomname: string) => void;
@@ -60,6 +60,7 @@ interface SocketData {
 
 const RoomSizesMap: Map<string, number> = new Map();
 const RoomMembersMap: Map<string, number> = new Map();
+const RoomMembersNameMap: Map<string, string[]> = new Map();
 const ScoresMap: Map<string, number> = new Map();
 let timeout;
 
@@ -107,7 +108,12 @@ io.on("connection", (socket) => {
       socket.emit('unableToJoin', 'Room Not Present')
     } else if (roomCurrentMembers < RoomSizesMap.get(name)) {
       socket.join(name);
-      socket.to(name).emit("userJoin", username);
+      // socket.to(name).emit("userJoin", username);
+      let membersNames = RoomMembersNameMap.has(name) ? RoomMembersNameMap.get(name) : [] ;
+      membersNames = [...membersNames, username];
+      RoomMembersNameMap.set(name,membersNames);
+      socket.to(name).emit("updateMembers", membersNames);
+      //newly added code above
       socket.emit("userJoinConfirm");
       RoomMembersMap.set(name, roomCurrentMembers + 1);
     } else {
@@ -141,11 +147,12 @@ io.on("connection", (socket) => {
 
   // LUCKY 7 APP SOCKET FUNCTIONS
 
-  socket.on("createLucky7Room", (name: string, size: number) => {
+  socket.on("createLucky7Room", (name: string, size: number, playerName: string) => {
     socket.join(name);
     RoomSizesMap.delete(name);
     RoomSizesMap.set(name, size);
     RoomMembersMap.set(name, 1);
+    RoomMembersNameMap.set(name,[playerName]);
     socket.emit("userJoinConfirm");
     setTimeout(() => {
       RoomSizesMap.delete(name);
