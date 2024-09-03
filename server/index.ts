@@ -113,6 +113,7 @@ io.on("connection", (socket) => {
       membersNames = [...membersNames, username];
       RoomMembersNameMap.set(name,membersNames);
       socket.to(name).emit("updateMembers", membersNames);
+      socket.emit("updateMembers", membersNames);
       //newly added code above
       socket.emit("userJoinConfirm");
       RoomMembersMap.set(name, roomCurrentMembers + 1);
