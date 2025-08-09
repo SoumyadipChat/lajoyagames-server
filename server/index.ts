@@ -27,6 +27,8 @@ interface ServerToClientEvents {
   startNextRound: () => void;
   receiveResults: (results: number[]) => void;
   playerReady: (playerIndex: number) => void;
+  //Poison Roullete
+  receiveSelection: (val: number) => void;
 }
 
 interface ClientToServerEvents {
@@ -47,6 +49,8 @@ interface ClientToServerEvents {
   getResults: (roomname: string,players: string[]) => void;
   startNextRound: (roomname: string) => void;
   playerReady: (roomname: string, playerIndex: number) => void;
+  //Poison Roulette
+  sendSelection: (roomname: string, val: number) => void;
 }
 
 interface InterServerEvents {
@@ -131,6 +135,9 @@ io.on("connection", (socket) => {
     socket.to(roomName).emit("receiveMove", index);
   });
 
+  socket.on("sendSelection", (roomName: string, index: number) => {
+    socket.to(roomName).emit("receiveSelection", index);
+  });
  
   socket.on("startGame", (roomName: string) => {
     socket.to(roomName).emit("startGame");
