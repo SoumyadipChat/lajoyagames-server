@@ -22,7 +22,7 @@ resource njsAppService 'Microsoft.Web/sites@2022-09-01' = {
     httpsOnly: true
     serverFarmId: nodeJSappServicePlan.id
     siteConfig: {
-      linuxFxVersion: 'NODE|18-lts'
+      linuxFxVersion: 'NODE|20-lts'
       appSettings: [
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
