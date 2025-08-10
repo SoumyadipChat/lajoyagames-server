@@ -16,6 +16,7 @@ interface ServerToClientEvents {
   userJoin: (string: any) => void;
   userJoinConfirm: () => void;
   unableToJoin: (string: any) => void;
+  sendLog: (string: any) => void;
   updateMembers: (names: string[]) => void;
   startGame: () => void;
   endGame: () => void;
@@ -97,7 +98,8 @@ io.on("connection", (socket) => {
   socket.on("createRoom", (name: string) => {
     socket.join(name);
     RoomSizesMap.set(name, 2);
-    RoomMembersMap.set(name, 1);
+    RoomMembersMap.set(name, 0);
+    socket.emit('sendLog', `${name} created`);
     setTimeout(() => {
       RoomSizesMap.delete(name);
       RoomMembersMap.delete(name);
@@ -106,11 +108,12 @@ io.on("connection", (socket) => {
 
   socket.on("joinRoom", async (name: string, username: string) => {
     console.log('join',username);
+    socket.emit('sendLog', `${username} Joins`);
     const roomCurrentMembers = RoomMembersMap.get(name);
     let membersNames = RoomMembersNameMap.has(name) ? RoomMembersNameMap.get(name) : [] ;    
 
     if (!RoomSizesMap.has(name)) {
-      socket.emit('unableToJoin', 'Room Not Present')
+      socket.emit('unableToJoin', `Room ${name} for ${username} Not Present`)
     } else if (roomCurrentMembers < RoomSizesMap.get(name)) {
       socket.join(name);
       // socket.to(name).emit("userJoin", username);
