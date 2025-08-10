@@ -105,7 +105,7 @@ io.on("connection", (socket) => {
     setTimeout(() => {
       RoomSizesMap.delete(name);
       RoomMembersMap.delete(name);
-    }, 60000 * 120);
+    }, 60000 * 60);
   });
 
   socket.on("leaveRoom", (name: string) => {
