@@ -36,6 +36,7 @@ interface ClientToServerEvents {
   hello: (arg: any) => void;
   //TicTactToe + Common Events
   createRoom: (name: string) => void;
+  leaveRoom: (name: string) => void;
   joinRoom: (name: string, username: string) => void;
   updateMembers: (roomName: string, names: string[]) => void;
   sendMessage: (val: any) => void;
@@ -99,11 +100,17 @@ io.on("connection", (socket) => {
     socket.join(name);
     RoomSizesMap.set(name, 2);
     RoomMembersMap.set(name, 0);
+    RoomMembersNameMap.set(name,[]);
     socket.emit('sendLog', `${name} created`);
     setTimeout(() => {
       RoomSizesMap.delete(name);
       RoomMembersMap.delete(name);
     }, 60000 * 120);
+  });
+
+  socket.on("leaveRoom", (name: string) => {
+    socket.leave(name);
+    socket.emit('sendLog', `${name} room left`);
   });
 
   socket.on("joinRoom", async (name: string, username: string) => {
