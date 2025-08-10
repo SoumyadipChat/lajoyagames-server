@@ -105,24 +105,25 @@ io.on("connection", (socket) => {
   });
 
   socket.on("joinRoom", async (name: string, username: string) => {
-    console.log('join');
+    console.log('join',username);
     const roomCurrentMembers = RoomMembersMap.get(name);
+    let membersNames = RoomMembersNameMap.has(name) ? RoomMembersNameMap.get(name) : [] ;    
 
     if (!RoomSizesMap.has(name)) {
       socket.emit('unableToJoin', 'Room Not Present')
     } else if (roomCurrentMembers < RoomSizesMap.get(name)) {
       socket.join(name);
       // socket.to(name).emit("userJoin", username);
-      let membersNames = RoomMembersNameMap.has(name) ? RoomMembersNameMap.get(name) : [] ;
       membersNames = [...membersNames, username];
       RoomMembersNameMap.set(name,membersNames);
+      console.log('join',membersNames);
       socket.to(name).emit("updateMembers", membersNames);
       socket.emit("updateMembers", membersNames);
       //newly added code above
       socket.emit("userJoinConfirm");
       RoomMembersMap.set(name, roomCurrentMembers + 1);
     } else {
-      socket.emit('unableToJoin', 'Room Full');
+      socket.emit('unableToJoin', `Room Full ${membersNames.toString()}`);
     }
 
   })
