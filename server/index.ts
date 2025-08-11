@@ -154,6 +154,7 @@ io.on("connection", (socket) => {
 
   socket.on("sendEmoji", (roomName: string, val: string, player: number) => {
     socket.to(roomName).emit("receiveEmoji", val, player);
+    socket.emit("receiveEmoji", val, player);
   });
  
   socket.on("startGame", (roomName: string) => {
