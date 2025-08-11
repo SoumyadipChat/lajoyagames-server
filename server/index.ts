@@ -30,6 +30,7 @@ interface ServerToClientEvents {
   playerReady: (playerIndex: number) => void;
   //Poison Roullete
   receiveSelection: (val: number) => void;
+  receiveEmoji: (val: string, player: number) => void;
 }
 
 interface ClientToServerEvents {
@@ -53,6 +54,7 @@ interface ClientToServerEvents {
   playerReady: (roomname: string, playerIndex: number) => void;
   //Poison Roulette
   sendSelection: (roomname: string, val: number) => void;
+  sendEmoji: (roomname: string, val: string, player: number) => void;
 }
 
 interface InterServerEvents {
@@ -148,6 +150,10 @@ io.on("connection", (socket) => {
 
   socket.on("sendSelection", (roomName: string, index: number) => {
     socket.to(roomName).emit("receiveSelection", index);
+  });
+
+  socket.on("sendEmoji", (roomName: string, val: string, player: number) => {
+    socket.to(roomName).emit("receiveEmoji", val, player);
   });
  
   socket.on("startGame", (roomName: string) => {
